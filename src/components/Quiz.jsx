@@ -1,26 +1,48 @@
-import { useCallback, useState} from "react";
+import { useCallback, useState } from "react";
 import QUESTIONS from "../questions.js";
 import QuestionTimer from "./QuestionTimer.jsx";
 import quizCompleteImg from "../assets/quiz-complete.png";
 
 export default function Quiz() {
+  const [answerState, setAnswerState] = useState("");
   // to the store the users answers and initially it is empty
   const [userAnswers, setUserAnswers] = useState([]);
 
   // to get the current question index from the users answers list as how many answers has been given by the user
-  const activeQuestionIndex = userAnswers.length;
+  const activeQuestionIndex =
+    answerState === "" ? userAnswers.length : userAnswers.length - 1;      
 
   // to check if we are out of questions
   const quizIsComplete = activeQuestionIndex === QUESTIONS.length;
 
-  const handleSelectAnswer =  useCallback(function handleSelectAnswer(selectedAnswer) {
-    setUserAnswers((prevUserAnswers) => {
-      return [...prevUserAnswers, selectedAnswer];
-    });
-  }, []);    // no dependecy as there is no state or prop value is there
-  
+  const handleSelectAnswer = useCallback(
+    function handleSelectAnswer(selectedAnswer) {
+      setAnswerState("answered");
+
+      setUserAnswers((prevUserAnswers) => {
+        return [...prevUserAnswers, selectedAnswer];
+      });
+
+      setTimeout(() => {
+        if (selectedAnswer === QUESTIONS[activeQuestionIndex].answers[0]) {
+          setAnswerState("correct");
+        } else {
+          setAnswerState("wrong");
+        }
+      }, 1000);
+
+      setTimeout(() => {
+        setAnswerState('');
+      },2000);
+    },
+    [activeQuestionIndex]
+  ); // dependecy is there is as state value is there
+
   // here null represent that we haven't selected any option
-  const handleSkipAnswer = useCallback(() => handleSelectAnswer(null), [handleSelectAnswer]);  
+  const handleSkipAnswer = useCallback(
+    () => handleSelectAnswer(null),
+    [handleSelectAnswer]
+  );
   // here we have added the function as a dependency bcoz when the component is executed again the function is recreated and it depends on the props and the state.
 
   if (quizIsComplete) {
@@ -40,17 +62,30 @@ export default function Quiz() {
     <div id="quiz">
       <div id="question">
         <QuestionTimer
-        key={activeQuestionIndex}
+          key={activeQuestionIndex}
           timeout={10000}
-          onTimeOut={handleSkipAnswer}     
+          onTimeOut={handleSkipAnswer}
         />
         <h2>{QUESTIONS[activeQuestionIndex].text}</h2>
         <ul id="answers">
-          {shuffledAnswers.map((answer) => (
-            <li key={answer} className="answer">
-              <button onClick={() => handleSelectAnswer()}>{answer}</button>
-            </li>
-          ))}
+          {shuffledAnswers.map((answer) => { 
+            const isSelected = userAnswers[userAnswers.length - 1] === answer;
+            let cssClass = '';
+            // this is used to highlight the selected answer
+            if(answerState === 'correct' && isSelected){
+              cssClass = 'selected';
+            }
+
+            if((answerState === 'correct' || answerState === 'wrong') && isSelected){
+              cssClass = answerState;
+            }
+
+            return (<li key={answer} className="answer">
+              <button onClick={() => handleSelectAnswer(answer)} className={cssClass}>
+                {answer}
+              </button>
+            </li>);
+          })}
         </ul>
       </div>
     </div>
