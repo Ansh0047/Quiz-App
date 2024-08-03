@@ -15,12 +15,12 @@ export default function Answers({ answers, selectedAnswer, answerState, onSelect
         const isSelected = selectedAnswer === answer;
         let cssClass = "";
         // this is used to highlight the selected answer
-        if (answerState === "correct" && isSelected) {
-          cssClass = "selected";
+        if (answerState === 'answered' && isSelected) {
+          cssClass = 'selected';
         }
 
         if (
-          (answerState === "correct" || answerState === "wrong") &&
+          (answerState === 'correct' || answerState === 'wrong') &&
           isSelected
         ) {
           cssClass = answerState;
@@ -31,6 +31,7 @@ export default function Answers({ answers, selectedAnswer, answerState, onSelect
             <button
               onClick={() => onSelect(answer)}
               className={cssClass}
+              disabled={answerState !== ''}
             >
               {answer}
             </button>
