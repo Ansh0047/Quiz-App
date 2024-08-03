@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import QUESTIONS from "../questions.js";
-import QuestionTimer from "./QuestionTimer.jsx";
 import quizCompleteImg from "../assets/quiz-complete.png";
+import Question from "./Question.jsx";
 
 export default function Quiz() {
   const [answerState, setAnswerState] = useState("");
@@ -10,7 +10,7 @@ export default function Quiz() {
 
   // to get the current question index from the users answers list as how many answers has been given by the user
   const activeQuestionIndex =
-    answerState === "" ? userAnswers.length : userAnswers.length - 1;      
+    answerState === "" ? userAnswers.length : userAnswers.length - 1;
 
   // to check if we are out of questions
   const quizIsComplete = activeQuestionIndex === QUESTIONS.length;
@@ -32,8 +32,8 @@ export default function Quiz() {
       }, 1000);
 
       setTimeout(() => {
-        setAnswerState('');
-      },2000);
+        setAnswerState("");
+      }, 2000);
     },
     [activeQuestionIndex]
   ); // dependecy is there is as state value is there
@@ -54,40 +54,17 @@ export default function Quiz() {
     );
   }
 
-  // to shuffle the answers array in random order
-  const shuffledAnswers = [...QUESTIONS[activeQuestionIndex].answers];
-  shuffledAnswers.sort(() => Math.random() - 0.5); // if inner fucntion return +ve value then no sort else -ve value will sort the array
-
   return (
     <div id="quiz">
-      <div id="question">
-        <QuestionTimer
-          key={activeQuestionIndex}
-          timeout={10000}
-          onTimeOut={handleSkipAnswer}
-        />
-        <h2>{QUESTIONS[activeQuestionIndex].text}</h2>
-        <ul id="answers">
-          {shuffledAnswers.map((answer) => { 
-            const isSelected = userAnswers[userAnswers.length - 1] === answer;
-            let cssClass = '';
-            // this is used to highlight the selected answer
-            if(answerState === 'correct' && isSelected){
-              cssClass = 'selected';
-            }
-
-            if((answerState === 'correct' || answerState === 'wrong') && isSelected){
-              cssClass = answerState;
-            }
-
-            return (<li key={answer} className="answer">
-              <button onClick={() => handleSelectAnswer(answer)} className={cssClass}>
-                {answer}
-              </button>
-            </li>);
-          })}
-        </ul>
-      </div>
+      <Question
+        key={activeQuestionIndex}
+        questionText={QUESTIONS[activeQuestionIndex].text}
+        answers={QUESTIONS[activeQuestionIndex].answers}
+        onSelectAnswer={handleSelectAnswer}
+        selectedAnswer={userAnswers[userAnswers.length - 1]}
+        answerState={answerState}
+        onSkipAnswer={handleSkipAnswer}
+      />
     </div>
   );
 }
