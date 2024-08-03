@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import QUESTIONS from "../questions.js";
-import quizCompleteImg from "../assets/quiz-complete.png";
 import Question from "./Question.jsx";
+import Summary from "./Summary.jsx";
 
 export default function Quiz() {
   const [answerState, setAnswerState] = useState("");
@@ -32,12 +32,8 @@ export default function Quiz() {
   // here we have added the function as a dependency bcoz when the component is executed again the function is recreated and it depends on the props and the state.
 
   if (quizIsComplete) {
-    return (
-      <div id="summary">
-        <img src={quizCompleteImg} alt="quiz complete logo" />
-        <h2>Quiz Completed!</h2>
-      </div>
-    );
+    
+    return <Summary userAnswers={userAnswers} />;
   }
 
   return (
